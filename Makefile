@@ -19,8 +19,8 @@ test: uninstall install
 	cd tests && nosetests -v --with-coverage --cover-package=vlab_esrs_api
 
 images: build
-	sudo docker build -f ApiDockerfile -t willnx/vlab-esrs-api .
-	sudo docker build -f WorkerDockerfile -t willnx/vlab-esrs-worker .
+	docker build -f ApiDockerfile -t willnx/vlab-esrs-api .
+	docker build -f WorkerDockerfile -t willnx/vlab-esrs-worker .
 
 up:
 	docker-compose -p vlabesrs up --abort-on-container-exit
