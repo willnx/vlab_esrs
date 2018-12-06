@@ -23,10 +23,18 @@ class TestVMware(unittest.TestCase):
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
-        fake_get_info.return_value = {'worked': True, 'note': "ESRS=3.28"}
+        fake_get_info.return_value = {'component': 'ESRS',
+                                      'created': 1234,
+                                      'version': '3.28',
+                                      'configured': False,
+                                      'generation': 1}
 
         output = vmware.show_esrs(username='alice')
-        expected = {'myESRS': {'worked': True, 'note': "ESRS=3.28"}}
+        expected = {'myESRS': {'component': 'ESRS',
+                               'created': 1234,
+                               'version': '3.28',
+                               'configured': False,
+                               'generation': 1}}
 
         self.assertEqual(output, expected)
 
@@ -39,21 +47,27 @@ class TestVMware(unittest.TestCase):
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
-        fake_get_info.return_value = {'worked': True, 'note': "noIIQ=3.28"}
+        fake_get_info.return_value = {'component': 'otherThing',
+                                      'created': 1234,
+                                      'version': '3.28',
+                                      'configured': False,
+                                      'generation': 1}
 
         output = vmware.show_esrs(username='alice')
         expected = {}
 
         self.assertEqual(output, expected)
 
+    @patch.object(vmware.virtual_machine, 'set_meta')
     @patch.object(vmware, 'consume_task')
     @patch.object(vmware, 'Ova')
     @patch.object(vmware.virtual_machine, 'get_info')
     @patch.object(vmware.virtual_machine, 'deploy_from_ova')
     @patch.object(vmware, 'vCenter')
-    def test_create_esrs(self, fake_vCenter, fake_deploy_from_ova, fake_get_info, fake_Ova, fake_consume_task):
+    def test_create_esrs(self, fake_vCenter, fake_deploy_from_ova, fake_get_info, fake_Ova, fake_consume_task, set_meta):
         """``create_esrs`` returns the new esrs's info when everything works"""
         fake_logger = MagicMock()
+        fake_deploy_from_ova.return_value.name = 'myESRS'
         fake_Ova.return_value.networks = ['vLabNetwork']
         fake_get_info.return_value = {'worked' : True}
         fake_vCenter.return_value.__enter__.return_value.networks = {'someNetwork': vmware.vim.Network(moId='asdf')}
@@ -63,7 +77,7 @@ class TestVMware(unittest.TestCase):
                                     image='3.28',
                                     network='someNetwork',
                                     logger=fake_logger)
-        expected = {'worked': True}
+        expected = {'myESRS': {'worked': True}}
 
         self.assertEqual(output, expected)
 
@@ -117,7 +131,11 @@ class TestVMware(unittest.TestCase):
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
-        fake_get_info.return_value = {'worked': True, 'note': "ESRS=3.28"}
+        fake_get_info.return_value = {'component': 'ESRS',
+                                      'created': 1234,
+                                      'version': '3.28',
+                                      'configured': False,
+                                      'generation': 1}
         vmware.delete_esrs(username='alice', machine_name='myESRS', logger=fake_logger)
 
         self.assertTrue(fake_power.called)
