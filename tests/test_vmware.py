@@ -53,14 +53,16 @@ class TestVMware(unittest.TestCase):
     @patch.object(vmware, 'vCenter')
     def test_create_esrs(self, fake_vCenter, fake_deploy_from_ova, fake_get_info, fake_Ova, fake_consume_task):
         """``create_esrs`` returns the new esrs's info when everything works"""
+        fake_logger = MagicMock()
         fake_Ova.return_value.networks = ['vLabNetwork']
         fake_get_info.return_value = {'worked' : True}
         fake_vCenter.return_value.__enter__.return_value.networks = {'someNetwork': vmware.vim.Network(moId='asdf')}
 
         output = vmware.create_esrs(username='alice',
-                                         machine_name='myESRS',
-                                         image='3.28',
-                                         network='someNetwork')
+                                    machine_name='myESRS',
+                                    image='3.28',
+                                    network='someNetwork',
+                                    logger=fake_logger)
         expected = {'worked': True}
 
         self.assertEqual(output, expected)
@@ -72,6 +74,7 @@ class TestVMware(unittest.TestCase):
     @patch.object(vmware, 'vCenter')
     def test_create_esrs_value_error(self, fake_vCenter, fake_deploy_from_ova, fake_get_info, fake_Ova, fake_consume_task):
         """``create_esrs`` raises ValueError if supplied with a non-existing network"""
+        fake_logger = MagicMock()
         fake_Ova.return_value.networks = ['vLabNetwork']
         fake_get_info.return_value = {'worked' : True}
         fake_vCenter.return_value.__enter__.return_value.networks = {'someNetwork': vmware.vim.Network(moId='asdf')}
@@ -80,7 +83,8 @@ class TestVMware(unittest.TestCase):
             vmware.create_esrs(username='alice',
                                     machine_name='myESRS',
                                     image='3.28',
-                                    network='not a thing')
+                                    network='not a thing',
+                                    logger=fake_logger)
 
     @patch.object(vmware, 'consume_task')
     @patch.object(vmware, 'Ova')
@@ -89,6 +93,7 @@ class TestVMware(unittest.TestCase):
     @patch.object(vmware, 'vCenter')
     def test_create_esrs_bad_image(self, fake_vCenter, fake_deploy_from_ova, fake_get_info, fake_Ova, fake_consume_task):
         """``create_esrs`` raises ValueError if supplied with a non-existing image to deploy"""
+        fake_logger = MagicMock()
         fake_Ova.side_effect = FileNotFoundError('testing')
         fake_get_info.return_value = {'worked' : True}
         fake_vCenter.return_value.__enter__.return_value.networks = {'someNetwork': vmware.vim.Network(moId='asdf')}
@@ -97,8 +102,8 @@ class TestVMware(unittest.TestCase):
             vmware.create_esrs(username='alice',
                                     machine_name='myESRS',
                                     image='a.3.sdf',
-                                    network='someNetwork')
-
+                                    network='someNetwork',
+                                    logger=fake_logger)
 
     @patch.object(vmware.virtual_machine, 'get_info')
     @patch.object(vmware, 'consume_task')
@@ -106,13 +111,14 @@ class TestVMware(unittest.TestCase):
     @patch.object(vmware, 'vCenter')
     def test_delete_esrs(self, fake_vCenter, fake_power, fake_consume_task, fake_get_info):
         """``delete_esrs`` powers off the VM then deletes it"""
+        fake_logger = MagicMock()
         fake_vm = MagicMock()
         fake_vm.name = 'myESRS'
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
         fake_get_info.return_value = {'worked': True, 'note': "ESRS=3.28"}
-        vmware.delete_esrs(username='alice', machine_name='myESRS')
+        vmware.delete_esrs(username='alice', machine_name='myESRS', logger=fake_logger)
 
         self.assertTrue(fake_power.called)
         self.assertTrue(fake_vm.Destroy_Task.called)
@@ -123,6 +129,7 @@ class TestVMware(unittest.TestCase):
     @patch.object(vmware, 'vCenter')
     def test_delete_esrs_value_error(self, fake_vCenter, fake_power, fake_consume_task, fake_get_info):
         """``delete_esrs`` raises ValueError if no esrs machine has the supplied name"""
+        fake_logger = MagicMock()
         fake_vm = MagicMock()
         fake_vm.name = 'myESRS'
         fake_folder = MagicMock()
@@ -131,7 +138,7 @@ class TestVMware(unittest.TestCase):
         fake_get_info.return_value = {'worked': True, 'note': "ESRS=3.28"}
 
         with self.assertRaises(ValueError):
-            vmware.delete_esrs(username='alice', machine_name='not a thing')
+            vmware.delete_esrs(username='alice', machine_name='not a thing', logger=fake_logger)
 
     @patch.object(vmware.os, 'listdir')
     def test_list_images(self, fake_listdir):

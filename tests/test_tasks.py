@@ -15,7 +15,7 @@ class TestTasks(unittest.TestCase):
         """``show`` returns a dictionary when everything works as expected"""
         fake_vmware.show_esrs.return_value = {'worked': True}
 
-        output = tasks.show(username='bob')
+        output = tasks.show(username='bob', txn_id='myId')
         expected = {'content' : {'worked': True}, 'error': None, 'params': {}}
 
         self.assertEqual(output, expected)
@@ -25,7 +25,7 @@ class TestTasks(unittest.TestCase):
         """``show`` sets the error in the dictionary to the ValueError message"""
         fake_vmware.show_esrs.side_effect = [ValueError("testing")]
 
-        output = tasks.show(username='bob')
+        output = tasks.show(username='bob', txn_id='myId')
         expected = {'content' : {}, 'error': 'testing', 'params': {}}
 
         self.assertEqual(output, expected)
@@ -35,7 +35,7 @@ class TestTasks(unittest.TestCase):
         """``create`` returns a dictionary when everything works as expected"""
         fake_vmware.create_esrs.return_value = {'worked': True}
 
-        output = tasks.create(username='bob', machine_name='myESRS', image='3.28', network='someNetwork')
+        output = tasks.create(username='bob', machine_name='myESRS', image='3.28', network='someNetwork', txn_id='myId')
         expected = {'content' : {'worked': True}, 'error': None, 'params': {}}
 
         self.assertEqual(output, expected)
@@ -45,7 +45,7 @@ class TestTasks(unittest.TestCase):
         """``create`` sets the error in the dictionary to the ValueError message"""
         fake_vmware.create_esrs.side_effect = [ValueError("testing")]
 
-        output = tasks.create(username='bob', machine_name='myESRS', image='3.28', network='someNetwork')
+        output = tasks.create(username='bob', machine_name='myESRS', image='3.28', network='someNetwork', txn_id='myId')
         expected = {'content' : {}, 'error': 'testing', 'params': {}}
 
         self.assertEqual(output, expected)
@@ -55,7 +55,7 @@ class TestTasks(unittest.TestCase):
         """``delete`` returns a dictionary when everything works as expected"""
         fake_vmware.delete_esrs.return_value = {'worked': True}
 
-        output = tasks.delete(username='bob', machine_name='myESRS')
+        output = tasks.delete(username='bob', machine_name='myESRS', txn_id='myId')
         expected = {'content' : {}, 'error': None, 'params': {}}
 
         self.assertEqual(output, expected)
@@ -65,7 +65,7 @@ class TestTasks(unittest.TestCase):
         """``delete`` sets the error in the dictionary to the ValueError message"""
         fake_vmware.delete_esrs.side_effect = [ValueError("testing")]
 
-        output = tasks.delete(username='bob', machine_name='myESRS')
+        output = tasks.delete(username='bob', machine_name='myESRS', txn_id='myId')
         expected = {'content' : {}, 'error': 'testing', 'params': {}}
 
         self.assertEqual(output, expected)
@@ -75,7 +75,7 @@ class TestTasks(unittest.TestCase):
         """``image`` returns a dictionary when everything works as expected"""
         fake_vmware.list_images.return_value = []
 
-        output = tasks.image()
+        output = tasks.image(txn_id='myId')
         expected = {'content' : {'image': []}, 'error': None, 'params': {}}
 
         self.assertEqual(output, expected)
