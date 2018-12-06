@@ -82,6 +82,24 @@ class TestVMware(unittest.TestCase):
                                     image='3.28',
                                     network='not a thing')
 
+    @patch.object(vmware, 'consume_task')
+    @patch.object(vmware, 'Ova')
+    @patch.object(vmware.virtual_machine, 'get_info')
+    @patch.object(vmware.virtual_machine, 'deploy_from_ova')
+    @patch.object(vmware, 'vCenter')
+    def test_create_esrs_bad_image(self, fake_vCenter, fake_deploy_from_ova, fake_get_info, fake_Ova, fake_consume_task):
+        """``create_esrs`` raises ValueError if supplied with a non-existing image to deploy"""
+        fake_Ova.side_effect = FileNotFoundError('testing')
+        fake_get_info.return_value = {'worked' : True}
+        fake_vCenter.return_value.__enter__.return_value.networks = {'someNetwork': vmware.vim.Network(moId='asdf')}
+
+        with self.assertRaises(ValueError):
+            vmware.create_esrs(username='alice',
+                                    machine_name='myESRS',
+                                    image='a.3.sdf',
+                                    network='someNetwork')
+
+
     @patch.object(vmware.virtual_machine, 'get_info')
     @patch.object(vmware, 'consume_task')
     @patch.object(vmware.virtual_machine, 'power')
