@@ -23,18 +23,18 @@ class TestVMware(unittest.TestCase):
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
-        fake_get_info.return_value = {'component': 'ESRS',
-                                      'created': 1234,
-                                      'version': '3.28',
-                                      'configured': False,
-                                      'generation': 1}
+        fake_get_info.return_value = {'meta' : {'component': 'ESRS',
+                                                'created': 1234,
+                                                'version': '3.28',
+                                                'configured': False,
+                                                'generation': 1}}
 
         output = vmware.show_esrs(username='alice')
-        expected = {'myESRS': {'component': 'ESRS',
-                               'created': 1234,
-                               'version': '3.28',
-                               'configured': False,
-                               'generation': 1}}
+        expected = {'myESRS': {'meta' : {'component': 'ESRS',
+                                         'created': 1234,
+                                         'version': '3.28',
+                                         'configured': False,
+                                         'generation': 1}}}
 
         self.assertEqual(output, expected)
 
@@ -47,11 +47,11 @@ class TestVMware(unittest.TestCase):
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
-        fake_get_info.return_value = {'component': 'otherThing',
-                                      'created': 1234,
-                                      'version': '3.28',
-                                      'configured': False,
-                                      'generation': 1}
+        fake_get_info.return_value = {'meta' : {'component': 'otherThing',
+                                                'created': 1234,
+                                                'version': '3.28',
+                                                'configured': False,
+                                                'generation': 1}}
 
         output = vmware.show_esrs(username='alice')
         expected = {}
@@ -131,11 +131,12 @@ class TestVMware(unittest.TestCase):
         fake_folder = MagicMock()
         fake_folder.childEntity = [fake_vm]
         fake_vCenter.return_value.__enter__.return_value.get_by_name.return_value = fake_folder
-        fake_get_info.return_value = {'component': 'ESRS',
-                                      'created': 1234,
-                                      'version': '3.28',
-                                      'configured': False,
-                                      'generation': 1}
+        fake_get_info.return_value = {'meta' : {'component': 'ESRS',
+                                                'created': 1234,
+                                                'version': '3.28',
+                                                'configured': False,
+                                                'generation': 1}}
+
         vmware.delete_esrs(username='alice', machine_name='myESRS', logger=fake_logger)
 
         self.assertTrue(fake_power.called)
