@@ -5,7 +5,7 @@ Defines the RESTful API for the ESRS deployment service
 import ujson
 from flask import current_app
 from flask_classy import request, route, Response
-from vlab_inf_common.views import TaskView
+from vlab_inf_common.views import MachineView
 from vlab_inf_common.vmware import vCenter, vim
 from vlab_api_common import describe, get_logger, requires, validate_input
 
@@ -16,9 +16,10 @@ from vlab_esrs_api.lib import const
 logger = get_logger(__name__, loglevel=const.VLAB_ESRS_LOG_LEVEL)
 
 
-class ESRSView(TaskView):
+class ESRSView(MachineView):
     """API end point for working with ESRS instances"""
     route_base = '/api/1/inf/esrs'
+    RESOURCE = 'esrs'
     POST_SCHEMA = { "$schema": "http://json-schema.org/draft-04/schema#",
                     "type": "object",
                     "description": "Create a ESRS instance",
