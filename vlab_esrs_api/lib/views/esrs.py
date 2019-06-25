@@ -18,7 +18,7 @@ logger = get_logger(__name__, loglevel=const.VLAB_ESRS_LOG_LEVEL)
 
 class ESRSView(MachineView):
     """API end point for working with ESRS instances"""
-    route_base = '/api/1/inf/esrs'
+    route_base = '/api/2/inf/esrs'
     RESOURCE = 'esrs'
     POST_SCHEMA = { "$schema": "http://json-schema.org/draft-04/schema#",
                     "type": "object",
@@ -81,7 +81,7 @@ class ESRSView(MachineView):
         body = kwargs['body']
         machine_name = body['name']
         image = body['image']
-        network = body['network']
+        network = '{}_{}'.format(username, body['network'])
         task = current_app.celery_app.send_task('esrs.create', [username, machine_name, image, network, txn_id])
         resp_data['content'] = {'task-id': task.id}
         resp = Response(ujson.dumps(resp_data))

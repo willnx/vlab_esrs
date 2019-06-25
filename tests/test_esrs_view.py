@@ -34,9 +34,19 @@ class TestESRSView(unittest.TestCase):
         cls.fake_task.id = 'asdf-asdf-asdf'
         app.celery_app.send_task.return_value = cls.fake_task
 
-    def test_get_task(self):
-        """ESRSView - GET on /api/1/inf/esrs returns a task-id"""
+    def test_v1_deprecated(self):
+        """ESRSView - GET on /api/1/inf/esrs returns an HTTP 404"""
         resp = self.app.get('/api/1/inf/esrs',
+                            headers={'X-Auth': self.token})
+
+        status = resp.status_code
+        expected = 404
+
+        self.assertEqual(status, expected)
+
+    def test_get_task(self):
+        """ESRSView - GET on /api/2/inf/esrs returns a task-id"""
+        resp = self.app.get('/api/2/inf/esrs',
                             headers={'X-Auth': self.token})
 
         task_id = resp.json['content']['task-id']
@@ -45,18 +55,18 @@ class TestESRSView(unittest.TestCase):
         self.assertEqual(task_id, expected)
 
     def test_get_task_link(self):
-        """ESRSView - GET on /api/1/inf/esrs sets the Link header"""
-        resp = self.app.get('/api/1/inf/esrs',
+        """ESRSView - GET on /api/2/inf/esrs sets the Link header"""
+        resp = self.app.get('/api/2/inf/esrs',
                             headers={'X-Auth': self.token})
 
         task_id = resp.headers['Link']
-        expected = '<https://localhost/api/1/inf/esrs/task/asdf-asdf-asdf>; rel=status'
+        expected = '<https://localhost/api/2/inf/esrs/task/asdf-asdf-asdf>; rel=status'
 
         self.assertEqual(task_id, expected)
 
     def test_post_task(self):
-        """ESRSView - POST on /api/1/inf/esrs returns a task-id"""
-        resp = self.app.post('/api/1/inf/esrs',
+        """ESRSView - POST on /api/2/inf/esrs returns a task-id"""
+        resp = self.app.post('/api/2/inf/esrs',
                              headers={'X-Auth': self.token},
                              json={'name': "myESRS", 'image': "3.28", 'network': "someNetwork"})
 
@@ -66,19 +76,19 @@ class TestESRSView(unittest.TestCase):
         self.assertEqual(task_id, expected)
 
     def test_post_task_link(self):
-        """ESRSView - POST on /api/1/inf/esrs sets the Link header"""
-        resp = self.app.post('/api/1/inf/esrs',
+        """ESRSView - POST on /api/2/inf/esrs sets the Link header"""
+        resp = self.app.post('/api/2/inf/esrs',
                              headers={'X-Auth': self.token},
                              json={'name': "myESRS", 'image': "3.28", 'network': "someNetwork"})
 
         task_id = resp.headers['Link']
-        expected = '<https://localhost/api/1/inf/esrs/task/asdf-asdf-asdf>; rel=status'
+        expected = '<https://localhost/api/2/inf/esrs/task/asdf-asdf-asdf>; rel=status'
 
         self.assertEqual(task_id, expected)
 
     def test_delete_task(self):
-        """ESRSView - DELETE on /api/1/inf/esrs returns a task-id"""
-        resp = self.app.delete('/api/1/inf/esrs',
+        """ESRSView - DELETE on /api/2/inf/esrs returns a task-id"""
+        resp = self.app.delete('/api/2/inf/esrs',
                                headers={'X-Auth': self.token},
                                json={'name': "myESRS"})
 
@@ -88,19 +98,19 @@ class TestESRSView(unittest.TestCase):
         self.assertEqual(task_id, expected)
 
     def test_delete_task_link(self):
-        """ESRSView - DELETE on /api/1/inf/esrs sets the Link header"""
-        resp = self.app.delete('/api/1/inf/esrs',
+        """ESRSView - DELETE on /api/2/inf/esrs sets the Link header"""
+        resp = self.app.delete('/api/2/inf/esrs',
                                headers={'X-Auth': self.token},
                                json={'name': "myESRS"})
 
         task_id = resp.headers['Link']
-        expected = '<https://localhost/api/1/inf/esrs/task/asdf-asdf-asdf>; rel=status'
+        expected = '<https://localhost/api/2/inf/esrs/task/asdf-asdf-asdf>; rel=status'
 
         self.assertEqual(task_id, expected)
 
     def test_get_image_task(self):
-        """ESRSView - GET on /api/1/inf/esrs/image returns a task-id"""
-        resp = self.app.get('/api/1/inf/esrs/image',
+        """ESRSView - GET on /api/2/inf/esrs/image returns a task-id"""
+        resp = self.app.get('/api/2/inf/esrs/image',
                             headers={'X-Auth': self.token})
 
         task_id = resp.json['content']['task-id']
@@ -109,12 +119,12 @@ class TestESRSView(unittest.TestCase):
         self.assertEqual(task_id, expected)
 
     def test_get_image_task(self):
-        """ESRSView - GET on /api/1/inf/esrs/image returns a task-id"""
-        resp = self.app.get('/api/1/inf/esrs/image',
+        """ESRSView - GET on /api/2/inf/esrs/image returns a task-id"""
+        resp = self.app.get('/api/2/inf/esrs/image',
                             headers={'X-Auth': self.token})
 
         task_id = resp.headers['Link']
-        expected = '<https://localhost/api/1/inf/esrs/task/asdf-asdf-asdf>; rel=status'
+        expected = '<https://localhost/api/2/inf/esrs/task/asdf-asdf-asdf>; rel=status'
 
         self.assertEqual(task_id, expected)
 
