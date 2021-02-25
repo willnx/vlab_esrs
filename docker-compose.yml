@@ -11,14 +11,14 @@ services:
       - INF_VCENTER_USER=Administrator@vsphere.local
       - INF_VCENTER_PASSWORD=1.Password
     volumes:
-      - ./vlab_esrs_api:/usr/lib/python3.6/site-packages/vlab_esrs_api
+      - ./vlab_esrs_api:/usr/lib/python3.8/site-packages/vlab_esrs_api
     command: ["python3", "app.py"]
 
   esrs-worker:
     image:
       willnx/vlab-esrs-worker
     volumes:
-      - ./vlab_esrs_api:/usr/lib/python3.6/site-packages/vlab_esrs_api
+      - ./vlab_esrs_api:/usr/lib/python3.8/site-packages/vlab_esrs_api
       - /mnt/raid/images/esrs:/images:ro
     environment:
       - INF_VCENTER_SERVER=changeME
